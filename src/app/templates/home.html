@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OTA Signer</title>
+    <style>
+        /* === GENERAL STYLES === */
+        body {
+            background-color: #0d1b0f;
+            color: #e2f0e5;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            margin: 40px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        h2 {
+            color: #8ef39b;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        /* === FORM CONTAINER === */
+        .form-container {
+            max-width: 550px;
+            margin: auto;
+            background-color: #143d1c;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px #00aa4f44;
+            border: 1px solid #1f7035;
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+            color: #9dfca7;
+            font-weight: 600;
+        }
+
+        input[type="file"],
+        select,
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            background-color: #1b2e1d;
+            color: #dfffe2;
+            border: 1px solid #1f7035;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        /* === BUTTONS === */
+        button,
+        .file-upload-button {
+            background-color: #21a64b;
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover,
+        .file-upload-button:hover {
+            background-color: #2fd65f;
+            box-shadow: 0 0 10px #00ff6e88;
+            transform: translateY(-1px);
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-size: 100px;
+            opacity: 0;
+            cursor: pointer;
+            height: 100%;
+            width: 100%;
+        }
+
+        #fileNameDisplay {
+            margin-top: 10px;
+            color: #a9ffba;
+            font-size: 0.95em;
+        }
+
+        /* === POPUP === */
+        .popup {
+            display: none;
+            background-color: #2ecb56;
+            color: #0d1b0f;
+            padding: 15px 25px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            border-radius: 6px;
+            z-index: 1000;
+            font-weight: bold;
+            box-shadow: 0 0 15px #00ff7f66;
+        }
+
+        /* === FILE LIST TABLE === */
+        .file-list-container {
+            background-color: #0e2613;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0, 128, 0, 0.3);
+            padding: 30px;
+            max-width: 1100px;
+            margin: 50px auto;
+            color: #e2f0e5;
+            font-family: 'Segoe UI', sans-serif;
+            overflow-x: auto;
+        }
+
+        .file-list-container table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #d8ffe1;
+            font-size: 16px;
+        }
+
+        .file-list-container thead {
+            background-color: #146b2f;
+            color: #b9ffd0;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .file-list-container th,
+        .file-list-container td {
+            padding: 12px 18px;
+            border-bottom: 1px solid #1e4626;
+            text-align: left;
+        }
+
+        .file-list-container tr:nth-child(even) {
+            background-color: #13301b;
+        }
+
+        .file-list-container tr:hover {
+            background-color: #1d4b29;
+        }
+
+        .file-list-container .status {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+
+        .file-list-container .status.pending { background-color: #b3f28f; color: #0e2613; }
+        .file-list-container .status.signed { background-color: #28a745; color: #fff; }
+        .file-list-container .status.approved { background-color: #1db954; color: #fff; }
+        .file-list-container .status.rejected { background-color: #e63946; color: #fff; }
+
+        .file-list-container .env-dev { color: #76ff7a; font-weight: bold; }
+        .file-list-container .env-prod { color: #39c67d; font-weight: bold; }
+
+        .file-list-container a.download-link {
+            color: #00ff7f;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .file-list-container a.download-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h2>OTA Signer Application</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+
+            <label for="file">Select the binary file:</label>
+            <div class="file-upload-wrapper">
+                <button class="file-upload-button">Search in device</button>
+                <input type="file" id="file" name="file" required>
+                <div id="fileNameDisplay"></div>
+            </div>
+
+            <label for="environment">Select the signature type:</label>
+            <select id="environment" name="environment">
+                <option value="dev">Development</option>
+                <option value="prod">Production</option>
+            </select>
+
+            <button type="submit">Upload File</button>
+        </form>
+    </div>
+
+    <div class="file-list-container">
+        <h2>Uploaded Files</h2>
+
+        {% if files and files|length > 0 %}
+        <table>
+            <thead>
+                <tr>
+                    <th>File ID</th>
+                    <th>Filename</th>
+                    <th>Environment</th>
+                    <th>Status</th>
+                    <th>Upload Date</th>
+                    <th>Signed File</th>
+                    <th>Signature</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in files %}
+                <tr>
+                    <td>{{ file.id }}</td>
+                    <td>{{ file.filename }}</td>
+                    <td class="environment env-{{ file.environment }}">{{ file.environment }}</td>
+                    <td><span class="status {{ file.status | lower }}">{{ file.status }}</span></td>
+                    <td>{{ file.uploaded_at }}</td>
+                    <td>{{ file.signed_path }}</td>
+                    <td>{{ file.signature }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No files have been uploaded yet.</p>
+        {% endif %}
+    </div>
+
+    <div id="popup" class="popup">File Successfully Uploaded</div>
+
+    <script>
+        const fileInput = document.getElementById('file');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const form = document.getElementById('uploadForm');
+        const popup = document.getElementById('popup');
+        const tableBody = document.querySelector('.file-list-container tbody');
+
+        fileInput.addEventListener('change', () => {
+            const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : '';
+            fileNameDisplay.textContent = fileName ? `Selected file: ${fileName}` : '';
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/upload', { method: 'POST', body: formData });
+                if (!response.ok) { alert("Upload failed."); return; }
+
+                const file = await response.json();
+                popup.textContent = "File successfully uploaded";
+                popup.style.display = 'block';
+                setTimeout(() => popup.style.display = 'none', 3000);
+
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${file.id}</td>
+                    <td>${file.filename}</td>
+                    <td class="environment env-${file.environment}">${file.environment}</td>
+                    <td><span class="status ${file.status}">${file.status}</span></td>
+                    <td>${file.uploaded_at || '—'}</td>
+                    <td>${file.signature || '—'}</td>
+                    <td>—</td>
+                `;
+
+                if (tableBody) tableBody.appendChild(newRow);
+                form.reset();
+                fileNameDisplay.textContent = '';
+            } catch (error) {
+                console.error("Error uploading file:", error);
+                alert("Error uploading file.");
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+[
+    {
+        "id": "9846155d-290c-4c9a-9e9c-0479df66e10f",
+        "filename": "dummy_firmable.bin",
+        "environment": "dev",
+        "status": "signed",
+        "uploaded_at": "2025-11-13T04:49:32.747380",
+        "signed_path": null,
+        "signature": null
+    },
+    {
+        "id": "3eee0141-6177-4e93-9c03-cfc3c4569c42",
+        "filename": "dummy_firmable.bin",
+        "environment": "dev",
+        "status": "signed",
+        "uploaded_at": "2025-11-13T04:50:19.300423",
+        "signed_path": null,
+        "signature": null
+    }
+]

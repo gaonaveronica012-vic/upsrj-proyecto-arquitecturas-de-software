@@ -1,0 +1,10 @@
+# ============================================================
+# Politécnica de Santa Rosa
+#
+# Materia: Arquitecturas de Software.
+# Profesor: Jesús Salvador López Ortega.
+# Grupo: ISW28.
+# Alumno: Veronica Vicente Gaona.
+# Archivo: proyecto Final.
+# Descripción: Archivo principal del proyecto.
+# ============================================================
