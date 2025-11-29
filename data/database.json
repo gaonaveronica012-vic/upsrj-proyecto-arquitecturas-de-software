@@ -1,20 +1,218 @@
-[
-    {
-        "id": "9846155d-290c-4c9a-9e9c-0479df66e10f",
-        "filename": "dummy_firmable.bin",
-        "environment": "dev",
-        "status": "signed",
-        "uploaded_at": "2025-11-13T04:49:32.747380",
-        "signed_path": null,
-        "signature": null
-    },
-    {
-        "id": "3eee0141-6177-4e93-9c03-cfc3c4569c42",
-        "filename": "dummy_firmable.bin",
-        "environment": "dev",
-        "status": "signed",
-        "uploaded_at": "2025-11-13T04:50:19.300423",
-        "signed_path": null,
-        "signature": null
-    }
-]
+{
+    "records": [
+        {
+            "id": "9846155d-290c-4c9a-9e9c-0479df66e10f",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "signed",
+            "uploaded_at": "2025-11-13T04:49:32.747380",
+            "signed_path": null,
+            "signature": null
+        },
+        {
+            "id": "3eee0141-6177-4e93-9c03-cfc3c4569c42",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "signed",
+            "uploaded_at": "2025-11-13T04:50:19.300423",
+            "signed_path": null,
+            "signature": null
+        },
+        {
+            "id": "861fc707-b281-421d-b2c5-b3f9d2c4bb9e",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "signed",
+            "uploaded_at": "2025-11-25T19:32:34.957033",
+            "signed_path": null,
+            "signature": null,
+            "file_path": null
+        },
+        {
+            "id": "70f39687-0757-43d3-82c0-1bf8fe23abe4",
+            "filename": "dummy_firmable.bin",
+            "environment": "prod",
+            "status": "approved",
+            "uploaded_at": "2025-11-25T19:50:32.818432",
+            "signed_path": null,
+            "signature": null,
+            "file_path": null
+        },
+        {
+            "id": "1db6ea1e-532a-4ebb-aa37-d9d9a861f7c7",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "signed",
+            "uploaded_at": "2025-11-26T03:47:45.129366",
+            "signed_path": null,
+            "signature": null,
+            "file_path": "data/binaries/1db6ea1e-532a-4ebb-aa37-d9d9a861f7c7"
+        },
+        {
+            "id": "5b36fd5f-6054-488b-a639-8cd722b014e2",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "signed",
+            "uploaded_at": "2025-11-26T04:06:41.609787",
+            "signed_path": "data/signed/signed_5b36fd5f-6054-488b-a639-8cd722b014e2",
+            "signature": "d8bade32ffa13c5670a01e812573d6ca13be556b651cb545b195b40fdb1daffe",
+            "file_path": "data/binaries/5b36fd5f-6054-488b-a639-8cd722b014e2"
+        },
+        {
+            "id": "1c588cd0-6363-46ab-977e-a0140ecf50d0",
+            "filename": "dummy_firmable.bin",
+            "environment": "prod",
+            "status": "signed",
+            "uploaded_at": "2025-11-26T04:09:05.266941",
+            "signed_path": "data/signed/signed_1c588cd0-6363-46ab-977e-a0140ecf50d0",
+            "signature": "d8bade32ffa13c5670a01e812573d6ca13be556b651cb545b195b40fdb1daffe",
+            "file_path": "data/binaries/1c588cd0-6363-46ab-977e-a0140ecf50d0"
+        },
+        {
+            "id": "97e6011a-65af-4674-a652-cfd9ee84c8ea",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "signed",
+            "uploaded_at": "2025-11-28T17:30:39.192851",
+            "signed_path": "data/signed/signed_97e6011a-65af-4674-a652-cfd9ee84c8ea",
+            "signature": "d8bade32ffa13c5670a01e812573d6ca13be556b651cb545b195b40fdb1daffe",
+            "file_path": "data/binaries/97e6011a-65af-4674-a652-cfd9ee84c8ea"
+        },
+        {
+            "id": "a0fb19b6-3f89-4024-9e37-abc119dc6854",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "signed",
+            "uploaded_at": "2025-11-28T18:06:51.272022",
+            "signed_path": "data/signed/signed_a0fb19b6-3f89-4024-9e37-abc119dc6854",
+            "signature": "d8bade32ffa13c5670a01e812573d6ca13be556b651cb545b195b40fdb1daffe",
+            "file_path": "data/binaries/a0fb19b6-3f89-4024-9e37-abc119dc6854"
+        },
+        {
+            "id": "5a7a77ec-6434-4018-990a-d530df3baf1c",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "signed",
+            "uploaded_at": "2025-11-28T18:13:13.233475",
+            "signed_path": "data/signed/signed_5a7a77ec-6434-4018-990a-d530df3baf1c",
+            "signature": "d8bade32ffa13c5670a01e812573d6ca13be556b651cb545b195b40fdb1daffe",
+            "file_path": "data/binaries/5a7a77ec-6434-4018-990a-d530df3baf1c"
+        },
+        {
+            "id": "1c20ed8d-f247-436d-a185-a41d201c8dd4",
+            "filename": "dummy_firmable.bin",
+            "environment": "prod",
+            "status": "signed",
+            "uploaded_at": "2025-11-28T18:14:18.315693",
+            "signed_path": "data/signed/signed_1c20ed8d-f247-436d-a185-a41d201c8dd4",
+            "signature": "d8bade32ffa13c5670a01e812573d6ca13be556b651cb545b195b40fdb1daffe",
+            "file_path": "data/binaries/1c20ed8d-f247-436d-a185-a41d201c8dd4"
+        },
+        {
+            "id": "aac65956-2217-414c-ae08-e82d389dd6c9",
+            "filename": "dummy_firmable.bin",
+            "environment": "prod",
+            "status": "signed",
+            "uploaded_at": "2025-11-28T18:14:20.757045",
+            "signed_path": "data/signed/signed_aac65956-2217-414c-ae08-e82d389dd6c9",
+            "signature": "d8bade32ffa13c5670a01e812573d6ca13be556b651cb545b195b40fdb1daffe",
+            "file_path": "data/binaries/aac65956-2217-414c-ae08-e82d389dd6c9"
+        },
+        {
+            "id": "1c1b87c4-4f05-4c45-be3a-6a682e76b820",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "rejected",
+            "uploaded_at": "2025-11-29T02:35:25.827158",
+            "signed_path": null,
+            "signature": null,
+            "file_path": "data/binaries/1c1b87c4-4f05-4c45-be3a-6a682e76b820"
+        },
+        {
+            "id": "8f153439-aa2f-4093-87b2-adeeb5cfe988",
+            "filename": "dummy_firmable.bin",
+            "environment": "prod",
+            "status": "signed",
+            "uploaded_at": "2025-11-29T02:35:40.521764",
+            "signed_path": "data/signed/signed_8f153439-aa2f-4093-87b2-adeeb5cfe988",
+            "signature": "d8bade32ffa13c5670a01e812573d6ca13be556b651cb545b195b40fdb1daffe",
+            "file_path": "data/binaries/8f153439-aa2f-4093-87b2-adeeb5cfe988"
+        },
+        {
+            "id": "4474e1b4-b2a1-4082-92fb-b14e8081577b",
+            "filename": "dummy_firmable.bin",
+            "environment": "prod",
+            "status": "signed",
+            "uploaded_at": "2025-11-29T02:46:41.881102",
+            "signed_path": "data/signed/signed_4474e1b4-b2a1-4082-92fb-b14e8081577b",
+            "signature": "d8bade32ffa13c5670a01e812573d6ca13be556b651cb545b195b40fdb1daffe",
+            "file_path": "data/binaries/4474e1b4-b2a1-4082-92fb-b14e8081577b"
+        },
+        {
+            "id": "a41e9211-6b67-48cc-8827-7dc4fed84e1b",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "pending",
+            "uploaded_at": "2025-11-29T02:46:54.616734",
+            "signed_path": null,
+            "signature": null,
+            "file_path": "data/binaries/a41e9211-6b67-48cc-8827-7dc4fed84e1b"
+        },
+        {
+            "id": "6c9ab804-d3aa-4815-9a34-7c122c5bed72",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "signed",
+            "uploaded_at": "2025-11-29T02:58:11.301125",
+            "signed_path": "data/signed/signed_6c9ab804-d3aa-4815-9a34-7c122c5bed72",
+            "signature": "d8bade32ffa13c5670a01e812573d6ca13be556b651cb545b195b40fdb1daffe",
+            "file_path": "data/binaries/6c9ab804-d3aa-4815-9a34-7c122c5bed72"
+        },
+        {
+            "id": "2b44956e-c944-49b2-8763-4711adbed956",
+            "filename": "dummy_firmable.bin",
+            "environment": "prod",
+            "status": "signed",
+            "uploaded_at": "2025-11-29T02:58:34.665616",
+            "signed_path": "data/signed/signed_2b44956e-c944-49b2-8763-4711adbed956",
+            "signature": "d8bade32ffa13c5670a01e812573d6ca13be556b651cb545b195b40fdb1daffe",
+            "file_path": "data/binaries/2b44956e-c944-49b2-8763-4711adbed956"
+        },
+        {
+            "id": "aa08be93-f8ec-45f6-94b2-8371d3ac1628",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "pending",
+            "uploaded_at": "2025-11-29T03:31:29.692580",
+            "signed_path": null,
+            "signature": null,
+            "file_path": "data/binaries/aa08be93-f8ec-45f6-94b2-8371d3ac1628",
+            "approval_token": null,
+            "reject_token": null
+        },
+        {
+            "id": "f5ca39dd-e290-4ae3-a5af-6af1e368fd8f",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "pending",
+            "uploaded_at": "2025-11-29T03:53:20.476323",
+            "signed_path": null,
+            "signature": null,
+            "file_path": "data/binaries/f5ca39dd-e290-4ae3-a5af-6af1e368fd8f",
+            "approval_token": null,
+            "reject_token": null
+        },
+        {
+            "id": "69bb2ce4-6559-4a1b-85e6-9e2dc6100557",
+            "filename": "dummy_firmable.bin",
+            "environment": "dev",
+            "status": "pending",
+            "uploaded_at": "2025-11-29T03:53:51.534038",
+            "signed_path": null,
+            "signature": null,
+            "file_path": "data/binaries/69bb2ce4-6559-4a1b-85e6-9e2dc6100557",
+            "approval_token": null,
+            "reject_token": null
+        }
+    ]
+}

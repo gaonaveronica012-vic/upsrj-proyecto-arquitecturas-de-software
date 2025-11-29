@@ -1,89 +1,139 @@
+# ============================================================
+# Politécnica de Santa Rosa
+# Materia: Arquitecturas de Software.
+# Profesor: Jesús Salvador López Ortega.
+# Grupo: ISW28.
+# Alumna: Veronica Vicente Gaona.
+# Archivo: ports.py
+# ============================================================
+# Descripción:
+# Este módulo define las interfaces (puertos) que conforman la
+# capa de abstracción entre la aplicación y las implementaciones
+# concretas de la infraestructura. Siguiendo los principios de
+# Arquitectura Limpia, estas interfaces permiten desacoplar el
+# dominio de:
+#
+#   - Repositorios de archivos
+#   - Repositorio de base de datos (JSON)
+#   - Servicio de firmado digital
+#   - Servicio de notificaciones por correo
+#
+# Cualquier clase de infraestructura debe implementar estas
+# interfaces para garantizar la intercambiabilidad, pruebas
+# unitarias aisladas y una arquitectura flexible, escalable
+# y totalmente modular.
+# ============================================================
+
 from abc import ABC, abstractmethod
-from typing import BinaryIO, Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
+from src.domain.models import BinaryFile
 
 
-# ======================================================
-# 📁 File Repository Port (interfaz para archivos binarios)
-# ======================================================
+# ============================================================
+#   REPOSITORIO DE ARCHIVOS
+# ============================================================
 
-class FileRepositoryPort(ABC):
-    """
-    Define las operaciones necesarias para el manejo de archivos binarios.
-    Implementado por: src/infrastructure/file_repository.py
-    """
+class IFileRepository(ABC):
 
     @abstractmethod
-    def save(self, file: BinaryIO, file_id: str, signed: bool = False) -> str:
+    def save(self, file: Any, file_id: str, signed: bool = False) -> str:
         """
-        Guarda un archivo binario (firmado o no) y devuelve la ruta completa.
-
-        Args:
-            file (BinaryIO): Archivo a guardar.
-            file_id (str): Identificador único del archivo.
-            signed (bool): Indica si es un archivo firmado.
-
-        Returns:
-            str: Ruta completa del archivo guardado.
+        Guarda un archivo binario (original o firmado) y devuelve la ruta.
         """
         pass
 
     @abstractmethod
     def load(self, file_path: str) -> bytes:
-        """Carga y devuelve el contenido binario de un archivo existente."""
-        pass
-
-    @abstractmethod
-    def delete(self, file_path: str) -> None:
-        """Elimina un archivo binario del sistema de archivos."""
+        """
+        Carga un archivo binario desde disco y devuelve sus bytes.
+        """
         pass
 
     @abstractmethod
     def move_to_signed(self, original_path: str, signed_data: bytes) -> str:
         """
-        Mueve un archivo a la carpeta de firmados y guarda los datos firmados.
+        Guarda el archivo firmado en /data/signed/.
+        """
+        pass
 
-        Returns:
-            str: Nueva ruta del archivo firmado.
+    @abstractmethod
+    def delete(self, file_path: str) -> None:
+        """
+        Elimina un archivo del sistema.
         """
         pass
 
     @abstractmethod
     def list_files(self, signed: bool = False) -> list:
-        """Lista los nombres de los archivos almacenados."""
+        """
+        Lista archivos normales o firmados.
+        """
         pass
 
 
-# ======================================================
-# 📄 JSON Repository Port (interfaz para base de datos JSON)
-# ======================================================
+# ============================================================
+#   REPOSITORIO DE BASE DE DATOS (JSON)
+# ============================================================
 
-class JsonRepositoryPort(ABC):
-    """
-    Define las operaciones necesarias para manejar registros en una base JSON.
-    Implementado por: src/infrastructure/json_repository.py
-    """
+class IDatabaseRepository(ABC):
 
     @abstractmethod
-    def add_record(self, record: Dict[str, Any]) -> None:
-        """Agrega un nuevo registro con marca de tiempo."""
+    def add_record(self, record: Any) -> None:
         pass
 
     @abstractmethod
-    def get_record(self, file_id: str) -> Optional[Dict[str, Any]]:
-        """Obtiene un registro específico por su ID."""
+    def get_record(self, file_id: str) -> Optional[BinaryFile]:
+        pass
+
+    @abstractmethod
+    def list_records(self) -> List[BinaryFile]:
         pass
 
     @abstractmethod
     def update_record(self, file_id: str, updates: Dict[str, Any]) -> bool:
-        """Actualiza los campos de un registro existente."""
-        pass
-
-    @abstractmethod
-    def list_records(self) -> List[Dict[str, Any]]:
-        """Lista todos los registros almacenados."""
         pass
 
     @abstractmethod
     def delete_record(self, file_id: str) -> bool:
-        """Elimina un registro por su ID."""
+        pass
+
+
+# ============================================================
+#   SERVICIO DE FIRMA DIGITAL
+# ============================================================
+
+class ISigningService(ABC):
+
+    @abstractmethod
+    def sign_file(self, binary: BinaryFile) -> (str, str):
+        """
+        Firma el archivo y devuelve:
+        - signature_hex: firma en texto hex
+        - signed_file_path: ruta del archivo firmado
+        """
+        pass
+
+
+# ============================================================
+#   🔥 NUEVO: SERVICIO DE NOTIFICACIÓN POR CORREO
+# ============================================================
+
+class INotifierService(ABC):
+    """
+    Interface para cualquier servicio que envíe correos
+    (por SMTP, SendGrid, Amazon SES, etc.)
+    """
+
+    @abstractmethod
+    def send_approval_request(self, binary: BinaryFile) -> None:
+        """
+        Envía correo cuando un archivo pasa a estado 'PENDING'.
+        """
+        pass
+
+    @abstractmethod
+    def send_signed_confirmation(self, binary: BinaryFile) -> None:
+        """
+        Envía correo cuando el archivo ya fue firmado (APPROVED).
+        """
         pass

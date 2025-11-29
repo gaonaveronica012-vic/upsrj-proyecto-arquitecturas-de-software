@@ -1,3 +1,17 @@
+# ============================================================
+# Politécnica de Santa Rosa
+# Materia: Arquitecturas de Software.
+# Profesor: Jesús Salvador López Ortega.
+# Grupo: ISW28.
+# Alumna: Veronica Vicente Gaona.
+# Archivo: vars.py
+# ============================================================
+# Descripción:
+# Define rutas base, directorios principales del proyecto y la
+# configuración del host/puerto del servidor. Centraliza valores
+# compartidos para facilitar la organización del sistema.
+# ============================================================
+
 import os
 from dataclasses import dataclass
 from typing import Tuple

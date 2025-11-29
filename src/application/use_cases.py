@@ -1,121 +1,233 @@
 # ============================================================
-# Universidad Politécnica de Santa Rosa Jáuregui.
-# Alumno: Veronica Vicente Gaona.
+# Politécnica de Santa Rosa
 # Materia: Arquitecturas de Software.
 # Profesor: Jesús Salvador López Ortega.
 # Grupo: ISW28.
-# Archivo: uses cases.py
-# Descripción:  Este archivo implementa el caso de uso para la carga 
-#              de archivos binarios. La clase UploadBinaryUseCase 
-#              se encarga de gestionar el proceso de almacenamiento 
-#              del archivo y el registro de sus metadatos en la base 
-#              de datos, generando un identificador único y 
-#              asignando su estado según el entorno (producción o 
-#              desarrollo). Devuelve una instancia del modelo 
-#              BinaryFile con la información del archivo cargado.
+# Alumna: Veronica Vicente Gaona.
+# Archivo: use_cases.py
 # ============================================================
+# Descripción:
+# Contiene los casos de uso de la aplicación, responsables de
+# coordinar la carga, aprobación, firma, rechazo y listado de
+# archivos, así como las notificaciones asociadas.
+# Implementa la lógica principal siguiendo Arquitectura Limpia.
 # ============================================================
-# Archivo: src/application/use_cases.py
-# ============================================================
+
 from datetime import datetime
 from uuid import uuid4
 from typing import List, Dict, Any, Optional
 
 from src.domain.models import BinaryFile
-from src.domain.services import SigningService
+from src.application.ports import (
+    IFileRepository,
+    IDatabaseRepository,
+    ISigningService,
+    INotifierService,
+)
 
-from src.infrastructure.json_repository import JsonRepository
-from src.infrastructure.file_repository import FileRepository
 
-
-# ============================================================
-# Caso de uso: Subir binarios
-# ============================================================
 class UploadBinaryUseCase:
-    def __init__(self, file_repo: FileRepository, db_repo: JsonRepository):
+    """
+    Upload: si environment == 'prod' -> sign automático (y notificar signed).
+    Si environment != 'prod' -> dejar pending, notificar approval request.
+    """
+
+    def __init__(
+        self,
+        file_repo: IFileRepository,
+        db_repo: IDatabaseRepository,
+        signing_service: ISigningService,
+        notifier: Optional[INotifierService] = None,
+    ):
         self.file_repo = file_repo
         self.db_repo = db_repo
+        self.signing_service = signing_service
+        self.notifier = notifier
 
     def execute(self, file, environment: str) -> BinaryFile:
-        """Guarda el archivo y registra su información en la base de datos JSON."""
         binary_id = str(uuid4())
+        saved_path = self.file_repo.save(file, binary_id)
 
-        # Guarda físicamente el archivo
-        self.file_repo.save(file, binary_id)
-
-        # Crea el objeto de dominio BinaryFile
+        # crear entidad y persistir initial
         binary = BinaryFile(
-            file_id=binary_id,
-            filename=file.filename,
+            id=binary_id,
+            filename=getattr(file, "filename", "unknown.bin"),
             environment=environment,
-            status='pending' if environment == 'prod' else 'signed',
+            status="pending",
             uploaded_at=datetime.now().isoformat(),
             signed_path=None,
-            signature=None
+            signature=None,
+            file_path=saved_path,
         )
 
-        # Guarda el registro en JSON
         self.db_repo.add_record(binary.to_dict())
+
+        # Si es producción: firmar automáticamente y notificar signed
+        if environment == "prod":
+            try:
+                signature, signed_path = self.signing_service.sign_file(binary)
+                binary.status = "signed"
+                binary.signature = signature
+                binary.signed_path = signed_path
+
+                self.db_repo.update_record(
+                    binary.id,
+                    {"status": binary.status, "signed_path": binary.signed_path, "signature": binary.signature},
+                )
+
+                if self.notifier:
+                    try:
+                        self.notifier.send_signed_confirmation(binary)
+                    except Exception as e:
+                        print(f"[UploadBinaryUseCase] Notifier failed (signed): {e}")
+
+            except Exception as e:
+                print(f"[UploadBinaryUseCase] Signing failed for prod: {e}")
+        else:
+            # No es prod -> enviar solicitud de aprobación (PENDING)
+            if self.notifier:
+                try:
+                    self.notifier.send_approval_request(binary)
+                except Exception as e:
+                    print(f"[UploadBinaryUseCase] Notifier failed (approval request): {e}")
+
         return binary
 
 
-# ============================================================
-# Caso de uso: Listar archivos subidos
-# ============================================================
 class ListFilesUseCase:
-    def __init__(self, db_repo: JsonRepository):
+    def __init__(self, db_repo: IDatabaseRepository):
         self.db_repo = db_repo
 
     def execute(self) -> List[Dict[str, Any]]:
-        """Devuelve la lista de archivos registrados en la base JSON."""
         try:
-            return self.db_repo.list_records()
+            records = self.db_repo.list_records()
+            return [r.to_dict() for r in records]
         except Exception as e:
             print(f"[ListFilesUseCase] Error retrieving records: {e}")
             return []
 
 
-# ============================================================
-# Caso de uso: Firmar binarios
-# ============================================================
 class SignBinaryUseCase:
-    def __init__(self, file_repo: FileRepository, json_repo: JsonRepository, signing_service: SigningService):
-        self.file_repo = file_repo
-        self.json_repo = json_repo
+    """
+    Firma solo archivos que ya están 'approved'.
+    """
+
+    def __init__(self, db_repo: IDatabaseRepository, signing_service: ISigningService, notifier: Optional[INotifierService] = None):
+        self.db_repo = db_repo
         self.signing_service = signing_service
+        self.notifier = notifier
 
     def execute(self, file_id: str) -> Optional[BinaryFile]:
-        """Firma un archivo binario ya subido y actualiza su registro en JSON."""
-        record = self.json_repo.get_record(file_id)
-
+        record = self.db_repo.get_record(file_id)
         if record is None:
             print(f"[SignBinaryUseCase] Record not found for file id: {file_id}")
             return None
 
+        if record.status != "approved":
+            print(f"[SignBinaryUseCase] Cannot sign file {file_id} with status '{record.status}'")
+            return None
+
         try:
-            binary = BinaryFile.from_dict(record)
+            signature, signed_path = self.signing_service.sign_file(record)
 
-            # Ejecuta el servicio de firma
-            signature, signed_path = self.signing_service.sign_file(binary)
+            record.status = "signed"
+            record.signature = signature
+            record.signed_path = signed_path
 
-            # Actualiza el estado
-            binary.status = "signed"
-            binary.signed_path = signed_path
-            binary.signature = signature
-
-            # Guarda los cambios
-            self.json_repo.update_record(
-                binary.id,
-                {
-                    "status": binary.status,
-                    "signed_path": binary.signed_path,
-                    "signature": binary.signature
-                }
+            self.db_repo.update_record(
+                record.id,
+                {"status": record.status, "signed_path": record.signed_path, "signature": record.signature},
             )
 
-            print(f"[SignBinaryUseCase] File '{binary.filename}' signed successfully.")
-            return binary
+            if self.notifier:
+                try:
+                    self.notifier.send_signed_confirmation(record)
+                except Exception as e:
+                    print(f"[SignBinaryUseCase] Notifier failed (signed): {e}")
+
+            return record
+        except Exception as e:
+            print(f"[SignBinaryUseCase] Error signing file {file_id}: {e}")
+            return None
+
+
+class ApproveBinaryUseCase:
+    """
+    Aprueba un archivo pending -> lo marca approved y luego dispara la firma.
+    """
+
+    def __init__(self, db_repo: IDatabaseRepository, signing_service: ISigningService, notifier: Optional[INotifierService] = None):
+        self.db_repo = db_repo
+        self.signing_service = signing_service
+        self.notifier = notifier
+
+    def execute(self, file_id: str) -> Optional[BinaryFile]:
+        record = self.db_repo.get_record(file_id)
+        if record is None:
+            print(f"[ApproveBinaryUseCase] Record not found: {file_id}")
+            return None
+
+        # Solo podemos aprobar si está pending
+        if record.status != "pending":
+            print(f"[ApproveBinaryUseCase] Cannot approve file with status '{record.status}'")
+            return None
+
+        # Marcar approved
+        record.status = "approved"
+        self.db_repo.update_record(file_id, {"status": "approved"})
+
+        # Firmar inmediatamente
+        try:
+            signature, signed_path = self.signing_service.sign_file(record)
+            record.status = "signed"
+            record.signature = signature
+            record.signed_path = signed_path
+
+            self.db_repo.update_record(
+                file_id,
+                {"status": record.status, "signed_path": record.signed_path, "signature": record.signature},
+            )
+
+            if self.notifier:
+                try:
+                    self.notifier.send_signed_confirmation(record)
+                except Exception as e:
+                    print(f"[ApproveBinaryUseCase] Notifier failed (signed): {e}")
+
+            return record
 
         except Exception as e:
-            print(f"[SignBinaryUseCase] Error while signing file '{file_id}': {e}")
+            print(f"[ApproveBinaryUseCase] Error signing after approve: {e}")
             return None
+
+
+class RejectBinaryUseCase:
+    """
+    Rechaza un archivo (pending -> rejected) y notifica.
+    """
+
+    def __init__(self, db_repo: IDatabaseRepository, notifier: Optional[INotifierService] = None):
+        self.db_repo = db_repo
+        self.notifier = notifier
+
+    def execute(self, file_id: str) -> Optional[BinaryFile]:
+        record = self.db_repo.get_record(file_id)
+        if record is None:
+            print(f"[RejectBinaryUseCase] Record not found: {file_id}")
+            return None
+
+        # Solo rechazar si está pending
+        if record.status != "pending":
+            print(f"[RejectBinaryUseCase] Cannot reject file with status '{record.status}'")
+            return None
+
+        record.status = "rejected"
+        self.db_repo.update_record(file_id, {"status": "rejected"})
+
+        if self.notifier:
+            try:
+                self.notifier.send_rejection_notification(record)
+            except Exception as e:
+                print(f"[RejectBinaryUseCase] Notifier failed (rejection): {e}")
+
+        return record

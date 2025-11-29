@@ -1,3 +1,16 @@
+# ============================================================
+# Politécnica de Santa Rosa
+# Materia: Arquitecturas de Software
+# Profesor: Jesús Salvador López Ortega
+# Grupo: ISW28
+# Alumna: Veronica Vicente Gaona
+# Archivo: vars.py
+# ============================================================
+# Descripción:
+# Define rutas base del proyecto y constantes de formato
+# para impresión en consola (colores ANSI y separadores).
+# ============================================================
+
 import os
 
 # Rutas relevantes
